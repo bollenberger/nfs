@@ -1,0 +1,2 @@
+mount -t nfs -o rsize=8192,wsize=8192,timeo=1,retrans=1,retry=1,nfsvers=2,proto=udp,port=1234,mountport=1234,hard,intr,nolock 127.0.0.1:/ /mnt
+umount /mnt
