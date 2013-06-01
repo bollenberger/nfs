@@ -22,7 +22,7 @@ class UDPClient < SUNRPC::UDPClient
 		})
 		client.shutdown
 		
-		super(program, version, address, port)
+		super(program, version, port, address)
 	end
 end
 
