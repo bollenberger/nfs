@@ -784,11 +784,11 @@ class TCPServer
 		eom_found = false
 		data = ""
 
-		puts "beginning"
+		#puts "beginning"
 
 		begin
 			header = client.recv(4)
-			puts "[defragment_data] header = #{header.inspect}"
+			#puts "[defragment_data] header = #{header.inspect}"
 
 			return nil if header.size != 4
 			header = header.unpack('N')[0]
@@ -796,14 +796,14 @@ class TCPServer
 			expected = header & 0x7fffffff
 
 			partial = client.recv(expected)
-			puts "[defragment_data] eom_found = #{eom_found}, expected = #{expected}, partial = #{partial.inspect}"
+			#puts "[defragment_data] eom_found = #{eom_found}, expected = #{expected}, partial = #{partial.inspect}"
 
 			return nil if partial.size != expected
 
 			data += partial
 		end while not eom_found 
 
-		puts "[defragment_data] returning"
+		#puts "[defragment_data] returning"
 
 		data
 
