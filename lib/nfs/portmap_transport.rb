@@ -96,7 +96,7 @@ class UDPServer < SUNRPC::UDPServer
 	end
 	
 	def shutdown
-		@portmap_shutdown.shutdown
+		# @portmap_shutdown.shutdown
 		super
 	end
 end
@@ -142,7 +142,7 @@ class TCPServer < SUNRPC::TCPServer
 	end
 	
 	def shutdown
-		@portmap_shutdown.shutdown
+		# @portmap_shutdown.shutdown
 		super
 	end
 end
