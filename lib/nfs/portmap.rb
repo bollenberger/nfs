@@ -2,7 +2,7 @@
 #
 # Author: Brian Ollenberger
 
-require 'sunrpc'
+require 'nfs/sunrpc'
 
 module Portmap
 

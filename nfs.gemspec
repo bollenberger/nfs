@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description = "Packaged NFS / SunRPC client/server code"
   s.authors     = ["Ruslaideemin"]
   s.email       = 'https://githunb.com/Ruslaideemin/'
-  s.files       = Dir["lib/nfs/*.rb"]
+  s.files       = Dir["lib/nfs/*.rb"] + [ "lib/nfs.rb"]
   s.homepage    =
     'https://github.com/Ruslaideemin/nfs'
 end

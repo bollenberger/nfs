@@ -3,7 +3,8 @@
 #
 # Author: Brian Ollenberger
 
-require 'portmap'
+require 'nfs/portmap'
+require 'nfs/sunrpc'
 
 module PortmapTransport
 

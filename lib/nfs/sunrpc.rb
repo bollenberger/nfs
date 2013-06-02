@@ -2,7 +2,7 @@
 #
 # Author: Brian Ollenberger
 
-require 'xdr'
+require 'nfs/xdr'
 require 'socket'
 require 'thread'
 
@@ -777,4 +777,113 @@ class UDPServer
 	end
 end
 
+class TCPServer
+	include Server
+	
+	def defragment_data(client)
+		eom_found = false
+		data = ""
+
+		puts "beginning"
+
+		begin
+			header = client.recv(4)
+			puts "[defragment_data] header = #{header.inspect}"
+
+			return nil if header.size != 4
+			header = header.unpack('N')[0]
+			eom_found = ((header & 0x80000000) == 0x80000000)
+			expected = header & 0x7fffffff
+
+			partial = client.recv(expected)
+			puts "[defragment_data] eom_found = #{eom_found}, expected = #{expected}, partial = #{partial.inspect}"
+
+			return nil if partial.size != expected
+
+			data += partial
+		end while not eom_found 
+
+		puts "[defragment_data] returning"
+
+		data
+
+	end
+
+	def initialize(programs, port = nil, address = '0.0.0.0')
+		if address.kind_of?(TCPServer)
+			@socket = address
+		else
+			@socket = ::TCPServer.open(address, port)
+		end
+		
+		@programs = hash_programs(programs)
+
+
+		
+		@thread = Thread.new do
+			while true
+				client = @socket.accept
+
+				Thread.new do
+					begin
+						begin
+							result = nil
+							data = defragment_data(client)
+
+							break if data.nil?
+
+							xid = nil
+							begin
+								xid, program_num, version_num, procedure_num, cred,
+								verf = decode_envelope(data)
+						
+								program = @programs[program_num]
+								if program.nil?
+									raise ProgramUnavailable
+								else
+									result = program.call(
+									version_num, procedure_num, data, cred, verf)
+									result = create_success_envelope(xid, result)
+								end
+							rescue IgnoreRequest, RequestDenied, AcceptedError => e
+								result = e.encode(xid)
+							end
+
+							if not result.nil?
+								client.send([ 0x80000000 | result.length].pack('N') + result, 0)
+							end
+						end while true
+					ensure
+						client.close
+					end
+				end
+			end
+		end
+				
+		
+		if block_given?
+			begin
+				yield(self)
+			ensure
+				shutdown
+			end
+		end
+	end
+	
+	def port
+		@socket.addr[1]
+	end
+	
+	def join
+		if not @thread.nil?
+			@thread.join
+		end
+	end
+	
+	def shutdown
+		Thread.kill(@thread)
+		@thread = nil
+		@socket.shutdown
+	end
+end
 end
