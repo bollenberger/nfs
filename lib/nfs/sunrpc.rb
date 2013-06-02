@@ -773,7 +773,7 @@ class UDPServer
 	def shutdown
 		Thread.kill(@thread)
 		@thread = nil
-		@socket.shutdown
+		@socket.close
 	end
 end
 
